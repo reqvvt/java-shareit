@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class UserRepository {
-    private List<User> users = new ArrayList<>();
+    private final List<User> users = new ArrayList<>();
     private Long userId = 0L;
 
     public List<User> getAllUsers() {
@@ -19,7 +19,7 @@ public class UserRepository {
 
     public Optional<User> getUserById(Long userId) {
         return users.stream()
-                    .filter(user -> user.getId() == userId)
+                    .filter(user -> user.getId().equals(userId))
                     .findAny();
     }
 
