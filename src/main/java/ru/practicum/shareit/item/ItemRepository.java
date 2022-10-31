@@ -15,13 +15,13 @@ public class ItemRepository {
 
     public List<Item> getAllItems(User owner) {
         return items.stream()
-                    .filter(item -> item.getOwner() == owner)
+                    .filter(item -> item.getOwner().equals(owner))
                     .collect(Collectors.toList());
     }
 
     public Optional<Item> getItemById(Long itemId) {
         return items.stream()
-                    .filter(item -> item.getId() == itemId)
+                    .filter(item -> item.getId().equals(itemId))
                     .findAny();
     }
 
