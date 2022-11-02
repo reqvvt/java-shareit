@@ -10,25 +10,24 @@ import java.util.stream.Collectors;
 @Repository
 @RequiredArgsConstructor
 public class ItemRepository {
-    private List<Item> items = new ArrayList<>();
+    private final Map<Long, Item> items = new HashMap<>();
     private Long itemId = 0L;
 
     public List<Item> getAllItems(User owner) {
-        return items.stream()
+        return items.values()
+                    .stream()
                     .filter(item -> item.getOwner().equals(owner))
                     .collect(Collectors.toList());
     }
 
     public Optional<Item> getItemById(Long itemId) {
-        return items.stream()
-                    .filter(item -> item.getId().equals(itemId))
-                    .findAny();
+        return Optional.ofNullable(items.get(itemId));
     }
 
     public Item addItem(Item item, User owner) {
         item.setId(updateItemId());
         item.setOwner(owner);
-        items.add(item);
+        items.put(item.getId(), item);
         return item;
     }
 
@@ -46,16 +45,18 @@ public class ItemRepository {
     }
 
     public void removeItem(Item item) {
-        items.remove(item);
+        items.remove(item.getId());
     }
 
     public List<Item> search(String text) {
         String str = text.toLowerCase(Locale.ROOT);
-        Set<Item> itemsByName = items.stream()
+        Set<Item> itemsByName = items.values()
+                                     .stream()
                                      .filter(Item::getAvailable)
                                      .filter(item -> item.getName().toLowerCase(Locale.ROOT).contains(str))
                                      .collect(Collectors.toSet());
-        Set<Item> itemsByDescription = items.stream()
+        Set<Item> itemsByDescription = items.values()
+                                            .stream()
                                             .filter(Item::getAvailable)
                                             .filter(item -> item.getDescription().toLowerCase(Locale.ROOT).contains(str))
                                             .collect(Collectors.toSet());

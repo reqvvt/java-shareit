@@ -3,29 +3,25 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
 public class UserRepository {
-    private final List<User> users = new ArrayList<>();
+    private final Map<Long, User> users = new HashMap<>();
     private Long userId = 0L;
 
     public List<User> getAllUsers() {
-        return users;
+        return new ArrayList<>(users.values());
     }
 
     public Optional<User> getUserById(Long userId) {
-        return users.stream()
-                    .filter(user -> user.getId().equals(userId))
-                    .findAny();
+        return Optional.ofNullable(users.get(userId));
     }
 
     public User addUser(User user) {
         user.setId(updateUserId());
-        users.add(user);
+        users.put(user.getId(), user);
         return user;
     }
 
@@ -40,7 +36,7 @@ public class UserRepository {
     }
 
     public void removeUser(User user) {
-        users.remove(user);
+        users.remove(user.getId());
     }
 
     private Long updateUserId() {
@@ -48,7 +44,7 @@ public class UserRepository {
     }
 
     public boolean contains(String email) {
-        for (User user : users) {
+        for (User user : users.values()) {
             if (user.getEmail().equals(email))
                 return true;
         }
