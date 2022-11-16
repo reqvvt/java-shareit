@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @RequiredArgsConstructor
-public class ItemRequest {
+public class ItemRequestDto {
     private Long id;
     private String description;
     private User requestor;
