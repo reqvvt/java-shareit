@@ -8,10 +8,10 @@ import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
-import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +63,7 @@ public class ItemServiceImpl implements ItemService {
         userRepository.findById(ownerId);
         Item oldItem = itemRepository.findById(itemId)
                                      .orElseThrow(() -> new NotFoundException(String.format("Вещь с id = %s не найдена", itemId)));
-        if (oldItem.getOwnerId() == ownerId) {
+        if (oldItem.getOwnerId().equals(ownerId)) {
             if (itemDto.getName() != null && !itemDto.getName().isBlank()) {
                 oldItem.setName(itemDto.getName());
             }
@@ -107,13 +107,13 @@ public class ItemServiceImpl implements ItemService {
         User author = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(
                 String.format("Пользователь с id = %s не найден", userId)));
         Booking booking = bookingRepository.findAllByBookerId(userId).stream()
-                                           .filter(b -> b.getItem().getId() == itemId)
+                                           .filter(b -> b.getItem().getId().equals(itemId))
                                            .filter(b -> b.getEnd().isBefore(LocalDateTime.now()))
                                            .findFirst()
                                            .orElseThrow(() -> new ValidationException(
                                                    String.format("Пользователь c id = %s не имеет бронирований", userId)));
 
-        if (booking.getBooker().getId() == userId) {
+        if (booking.getBooker().getId().equals(userId)) {
             Comment comment = CommentMapper.toComment(commentDto, item, author, LocalDateTime.now());
             log.info("Комментарий к вещи с id = {} пользователем с id = {} добавлен", itemId, userId);
             return CommentMapper.toCommentDto(commentRepository.save(comment));

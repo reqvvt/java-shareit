@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user;
 
-import lombok.experimental.UtilityClass;
 import org.springframework.stereotype.Component;
 
 @Component
