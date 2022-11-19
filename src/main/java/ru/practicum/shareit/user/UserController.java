@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,15 +13,10 @@ import java.util.List;
 
 @RestController
 @Slf4j
-@Validated
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
-
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @GetMapping
     public List<User> getAllUsers() {
@@ -29,25 +25,25 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public User getUserById(@PathVariable Long userId) {
+    public UserDto getUserById(@PathVariable Integer userId) {
         log.info("Вызван метод getUserById() в UserController");
         return userService.getUserById(userId);
     }
 
     @PostMapping
-    public User addUser(@RequestBody @Valid UserDto userDto) {
+    public UserDto addUser(@RequestBody @Valid UserDto userDto) {
         log.info("Вызван метод addUser() в UserController");
         return userService.addUser(userDto);
     }
 
     @PatchMapping("/{userId}")
-    public User updateUser(@RequestBody UserDto userDto, @PathVariable Long userId) {
+    public UserDto updateUser(@RequestBody UserDto userDto, @PathVariable Integer userId) {
         log.info("Вызван метод updateUser() в UserController");
         return userService.updateUser(userDto, userId);
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<HttpStatus> removeUser(@PathVariable Long userId) {
+    public ResponseEntity<HttpStatus> removeUser(@PathVariable Integer userId) {
         log.info("Вызван метод removeUser() в UserController");
         userService.removeUser(userId);
         return ResponseEntity.ok().build();

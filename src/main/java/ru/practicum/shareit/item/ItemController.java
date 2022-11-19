@@ -18,40 +18,47 @@ public class ItemController {
     private static final String X_SHARER_USER_ID = "X-Sharer-User-Id";
 
     @GetMapping
-    public List<Item> getAllItems(@RequestHeader(X_SHARER_USER_ID) Long userId) {
+    public List<ItemDtoInfo> getAllItems(@RequestHeader(X_SHARER_USER_ID) Integer userId) {
         log.info("Вызван метод getAllItems() в ItemController");
         return itemService.getAllItems(userId);
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@PathVariable Long itemId) {
+    public ItemDtoInfo getItemById(@RequestHeader(X_SHARER_USER_ID) Integer userId, @PathVariable Integer itemId) {
         log.info("Вызван метод getItemById() в ItemController");
-        return itemService.getItemById(itemId);
+        return itemService.getItemById(itemId, userId);
     }
 
     @PostMapping
-    public ItemDto addItem(@RequestBody @Valid ItemDto itemDto, @RequestHeader(X_SHARER_USER_ID) Long userId) {
+    public ItemDto addItem(@RequestBody @Valid ItemDto itemDto, @RequestHeader(X_SHARER_USER_ID) Integer userId) {
         log.info("Вызван метод addItem() в ItemController");
         return itemService.addItem(itemDto, userId);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@RequestBody ItemDto itemDto, @RequestHeader(X_SHARER_USER_ID) Long userId,
-                              @PathVariable Long itemId) {
+    public ItemDto updateItem(@RequestBody ItemDto itemDto, @RequestHeader(X_SHARER_USER_ID) Integer userId,
+                              @PathVariable Integer itemId) {
         log.info("Вызван метод updateItem() в ItemController");
         return itemService.updateItem(itemDto, userId, itemId);
     }
 
     @DeleteMapping("/{itemId}")
-    public ResponseEntity<HttpStatus> removeItem(@PathVariable Long itemId) {
+    public ResponseEntity<HttpStatus> removeItem(@PathVariable Integer itemId) {
         log.info("Вызван метод removeItem() в ItemController");
         itemService.removeItem(itemId);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/search")
-    public List<Item> searchItem(@RequestParam String text, @RequestHeader(X_SHARER_USER_ID) Long userId) {
+    public List<ItemDto> searchItem(@RequestParam String text, @RequestHeader(X_SHARER_USER_ID) Integer userId) {
         log.info("Вызван метод searchItem() в ItemController");
         return itemService.searchItem(text, userId);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addComment(@RequestHeader(X_SHARER_USER_ID) Integer userId, @PathVariable Integer itemId,
+                                 @Valid @RequestBody CommentDto commentDto) {
+        log.info("Вызван метод addComment() в ItemController");
+        return itemService.addComment(userId, itemId, commentDto);
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import javax.validation.ValidationException;
+import java.util.Map;
 
 @ControllerAdvice
 @Slf4j
@@ -28,5 +29,11 @@ public class ErrorHandler {
     public ResponseEntity<Response> handleException(NotFoundException e) {
         log.info("Ошибка: {}", e.getMessage());
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(MessageFailedException.class)
+    public ResponseEntity<Map<String, String>> handleException(MessageFailedException e) {
+        log.error("Ошибка 400: {}", e.getMessage(), e.getCause());
+        return new ResponseEntity<>(Map.of("error", e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }
