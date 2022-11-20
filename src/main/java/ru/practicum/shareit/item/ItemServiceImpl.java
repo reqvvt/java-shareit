@@ -30,7 +30,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDtoInfo> getAllItems(Integer ownerId) {
-        userRepository.findById(ownerId);
         log.info("Получены все вещи пользователя c id = {} (getAllItems())", ownerId);
         return itemRepository.findAllByOwner(ownerId).stream()
                              .map(i -> toItemDtoInfo(i, ownerId))
@@ -88,7 +87,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> searchItem(String text, Integer ownerId) {
-        userRepository.findById(ownerId);
         List<ItemDto> listItem = new ArrayList<>();
         if (text.length() != 0) {
             listItem = itemRepository.search(text).stream()
@@ -130,11 +128,15 @@ public class ItemServiceImpl implements ItemService {
                                                         .map(CommentMapper::toCommentDto)
                                                         .collect(Collectors.toList());
         ItemDtoInfo itemDtoInfo = ItemMapper.toItemDtoInfo(item);
-        if (lastBooking != null) {
+        try {
             itemDtoInfo.setLastBooking(BookingMapper.toBookingDtoForItem(lastBooking));
+        } catch (NullPointerException e) {
+            e.getMessage();
         }
-        if (nextBooking != null) {
+        try {
             itemDtoInfo.setNextBooking(BookingMapper.toBookingDtoForItem(nextBooking));
+        } catch (NullPointerException e) {
+            e.getMessage();
         }
         itemDtoInfo.setComments(commentDtos);
         return itemDtoInfo;

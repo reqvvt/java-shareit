@@ -12,8 +12,8 @@ import java.util.List;
 @Slf4j
 @RequestMapping(path = "/bookings")
 public class BookingController {
-    private final BookingService bookingService;
     private static final String X_SHARER_USER_ID = "X_Sharer-User-Id";
+    private final BookingService bookingService;
 
     @GetMapping("{bookingId}")
     public BookingDto getBookingById(@PathVariable Integer bookingId,

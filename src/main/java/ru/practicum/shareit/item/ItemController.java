@@ -14,8 +14,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/items")
 public class ItemController {
-    private final ItemService itemService;
     private static final String X_SHARER_USER_ID = "X-Sharer-User-Id";
+    private final ItemService itemService;
 
     @GetMapping
     public List<ItemDtoInfo> getAllItems(@RequestHeader(X_SHARER_USER_ID) Integer userId) {
