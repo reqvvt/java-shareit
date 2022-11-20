@@ -17,35 +17,35 @@ public class BookingController {
 
     @GetMapping("{bookingId}")
     public BookingDto getBookingById(@PathVariable Integer bookingId,
-                                     @RequestHeader(X_SHARER_USER_ID) Integer ownerId) {
+                                     @RequestHeader(value = X_SHARER_USER_ID, required = false) Integer ownerId) {
         log.info("Вызван метод getBookingById() в BookingController");
         return bookingService.getBookingById(bookingId, ownerId);
     }
 
     @GetMapping
     public List<BookingDto> getAllByBookerId(@RequestParam(defaultValue = "ALL", required = false) String state,
-                                             @RequestHeader(X_SHARER_USER_ID) Integer bookerId) {
+                                             @RequestHeader(value = X_SHARER_USER_ID, required = false) Integer bookerId) {
         log.info("Вызван метод getAllByBookerId() в BookingController");
         return bookingService.getAllByBookerId(bookerId, state);
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getAllByOwnerId(@RequestParam(defaultValue = "ALL", required = false) String state,
-                                            @RequestHeader(X_SHARER_USER_ID) Integer ownerId) {
+                                            @RequestHeader(value = X_SHARER_USER_ID, required = false) Integer ownerId) {
         log.info("Вызван метод getAllByOwnerId() в BookingController");
         return bookingService.getAllByOwnerId(ownerId, state);
     }
 
     @PostMapping
     public BookingDto updateBooking(@Valid @RequestBody BookingDtoIn bookingDtoIn,
-                                    @RequestHeader(X_SHARER_USER_ID) Integer userId) {
+                                    @RequestHeader(value = X_SHARER_USER_ID, required = false) Integer userId) {
         log.info("Вызван метод updateBooking() в BookingController");
         return bookingService.updateBooking(bookingDtoIn, userId);
     }
 
     @PatchMapping("{bookingId}")
     public BookingDto confirmation(@PathVariable Integer bookingId,
-                                   @RequestHeader(X_SHARER_USER_ID) Integer userId,
+                                   @RequestHeader(value = X_SHARER_USER_ID, required = false) Integer userId,
                                    @RequestParam Boolean approved) {
         log.info("Вызван метод confirmation() в BookingController");
         return bookingService.confirmation(bookingId, userId, approved);
