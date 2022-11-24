@@ -26,11 +26,17 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> getAllByBookerId(Integer bookerId, String state) {
+        BookingState bookingState;
+        try {
+            bookingState = BookingState.valueOf(state);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("{\"error\": \"Unknown state: " + state + "\" }");
+        }
         List<Booking> bookingList;
         LocalDateTime dateTime = LocalDateTime.now();
         userRepository.findById(bookerId).orElseThrow(() -> new NotFoundException(
                 String.format("Пользователь с id = %s не найден", bookerId)));
-        switch (BookingState.valueOf(state)) {
+        switch (bookingState) {
             case ALL:
                 bookingList = bookingRepository.findByBookerIdOrderByStartDesc(bookerId);
                 break;
@@ -74,6 +80,12 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> getAllByOwnerId(Integer ownerId, String state) {
+        BookingState bookingState;
+        try {
+            bookingState = BookingState.valueOf(state);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("{\"error\": \"Unknown state: " + state + "\" }");
+        }
         List<Integer> ownerItemsList = itemRepository.findAllByOwner(ownerId)
                                                      .stream()
                                                      .map(Item::getId)
@@ -82,7 +94,7 @@ public class BookingServiceImpl implements BookingService {
         LocalDateTime dateTime = LocalDateTime.now();
         userRepository.findById(ownerId).orElseThrow(() -> new NotFoundException(
                 String.format("Пользователь с id = %s не найден", ownerId)));
-        switch (BookingState.valueOf(state)) {
+        switch (bookingState) {
             case ALL:
                 bookingList = bookingRepository.findByItemIdInOrderByStartDesc(ownerItemsList);
                 break;
@@ -145,8 +157,10 @@ public class BookingServiceImpl implements BookingService {
         Item item = itemRepository.findById(bookingDtoIn.getItemId()).orElseThrow(() -> new NotFoundException(
                 String.format("Вещь с id = %s не найдена", bookingDtoIn.getItemId())));
         BookingDto bookingDto = BookingMapper.toBookingDto(bookingDtoIn, item);
-        if (bookingDto.getEnd().isBefore(bookingDto.getStart())) {
-            throw new ValidationException("Дата окончания брони раньше даты начала");
+        if (bookingDto.getStart().isBefore(LocalDateTime.now())
+                || bookingDto.getEnd().isBefore(LocalDateTime.now())
+                || bookingDto.getEnd().isBefore(bookingDto.getStart())) {
+            throw new ValidationException("Недопустимое время брони");
         }
         bookingDto.setItem(item);
         bookingDto.setBooker(booker);
