@@ -1,32 +1,48 @@
 package ru.practicum.shareit.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.connector.Response;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.validation.ValidationException;
+import javax.validation.ConstraintViolationException;
 
-@ControllerAdvice
+@RestControllerAdvice
 @Slf4j
 public class ErrorHandler {
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<Response> handleException(ValidationException e) {
-        log.info("Ошибка: {}", e.getMessage());
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleValidationException(ValidationException exception) {
+        log.error(exception.getMessage());
+        return exception.getMessage();
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Response> handleException(RuntimeException e) {
-        log.info("Ошибка: {}", e.getMessage());
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    @ExceptionHandler({ConstraintViolationException.class, MethodArgumentNotValidException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleAnnotationValidationException(final RuntimeException runtimeException) {
+        return runtimeException.getMessage();
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public String handleForbiddenException(ForbiddenException exception) {
+        log.error(exception.getMessage());
+        return exception.getMessage();
     }
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<Response> handleException(NotFoundException e) {
-        log.info("Ошибка: {}", e.getMessage());
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleNotFoundException(NotFoundException exception) {
+        log.error(exception.getMessage());
+        return exception.getMessage();
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handleException(Throwable exception) {
+        log.error(exception.getMessage());
+        return exception.getMessage();
     }
 }

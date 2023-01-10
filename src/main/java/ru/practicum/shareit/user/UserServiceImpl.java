@@ -1,52 +1,61 @@
 package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
 
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
     public List<User> getAllUsers() {
-        return userRepository.getAllUsers();
+        return userRepository.findAll();
     }
 
     @Override
-    public User getUserById(Long userId) {
-        return userRepository.getUserById(userId)
-                             .orElseThrow(() -> new NotFoundException((String.format(
-                                     "Пользователь с userId = %s не найден", userId))));
+    public UserDto getUserById(Integer userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(
+                (String.format("Пользователь с userId = %s не найден", userId))));
+        log.info("Получен пользователь с id = {}", userId);
+        return UserMapper.toUser(user);
     }
 
     @Override
-    public User addUser(UserDto userDto) {
-        User user = UserMapper.toUserDto(userDto);
-        validEmail(user);
-        return userRepository.addUser(user);
+    @Transactional
+    public UserDto addUser(UserDto userDto) {
+        User user = userRepository.save(UserMapper.toUserDto(userDto));
+        log.info("Пользователь с id = {} создан", user.getId());
+        return UserMapper.toUser(user);
     }
 
     @Override
-    public User updateUser(UserDto userDto, Long userId) {
-        User user = UserMapper.toUserDto(userDto);
-        validEmail(user);
-        User oldUser = getUserById(userId);
-        return userRepository.updateUser(user, oldUser);
-    }
-
-    @Override
-    public void removeUser(Long userId) {
-        User user = getUserById(userId);
-        userRepository.removeUser(user);
-    }
-
-    private void validEmail(User user) {
-        if (userRepository.contains(user.getEmail())) {
-            throw new RuntimeException("Пользователь с таким email уже зарегистрирован");
+    @Transactional
+    public UserDto updateUser(UserDto userDto, Integer userId) {
+        User user = UserMapper.toUserDto(getUserById(userId));
+        if (userDto.getName() != null && !userDto.getName().isBlank()) {
+            user.setName(userDto.getName());
         }
+        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
+            user.setEmail(userDto.getEmail());
+        }
+        log.info("Данные пользователя с id = {} обновлены", user.getId());
+        User newUser = userRepository.save(user);
+        return UserMapper.toUser(newUser);
+    }
+
+    @Override
+    @Transactional
+    public void removeUser(Integer userId) {
+        getUserById(userId);
+        userRepository.deleteById(userId);
+        log.info("Пользователь с id = {} удален", userId);
     }
 }
