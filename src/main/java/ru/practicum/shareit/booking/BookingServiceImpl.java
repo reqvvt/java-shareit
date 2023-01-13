@@ -2,6 +2,8 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -25,7 +27,7 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
 
     @Override
-    public List<BookingDto> getAllByBookerId(Integer bookerId, String state) {
+    public List<BookingDto> getAllByBookerId(Integer bookerId, String state, Integer from, Integer size) {
         BookingState bookingState;
         try {
             bookingState = BookingState.valueOf(state);
@@ -79,7 +81,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllByOwnerId(Integer ownerId, String state) {
+    public List<BookingDto> getAllByOwnerId(Integer ownerId, String state, Integer from, Integer size) {
         BookingState bookingState;
         try {
             bookingState = BookingState.valueOf(state);
@@ -197,5 +199,10 @@ public class BookingServiceImpl implements BookingService {
             return BookingMapper.toBookingDto(bookingRepository.save(booking));
         }
         throw new NotFoundException("Статус брони может изменять только владелец");
+    }
+
+    private PageRequest pagination(Integer from, Integer size) {
+        Integer page = from < size ? 0 : from / size;
+        return PageRequest.of(page, size, Sort.by("start").descending());
     }
 }

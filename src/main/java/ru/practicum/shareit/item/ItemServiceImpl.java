@@ -2,6 +2,8 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
@@ -9,9 +11,11 @@ import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
+import java.awt.print.Pageable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,10 +32,12 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
 
+    private final ItemRequestRepository itemRequestRepository;
+
     @Override
-    public List<ItemDtoInfo> getAllItems(Integer ownerId) {
+    public List<ItemDtoInfo> getAllItems(Integer ownerId, Integer from, Integer size) {
         log.info("Получены все вещи пользователя c id = {} (getAllItems())", ownerId);
-        return itemRepository.findAllByOwner(ownerId).stream()
+        return itemRepository.findAllByOwner(ownerId, (Pageable) pagination(from, size)).stream()
                              .map(i -> toItemDtoInfo(i, ownerId))
                              .collect(Collectors.toList());
     }
@@ -86,10 +92,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> searchItem(String text, Integer ownerId) {
+    public List<ItemDto> searchItem(String text, Integer ownerId, Integer from, Integer size) {
         List<ItemDto> listItem = new ArrayList<>();
         if (text.length() != 0) {
-            listItem = itemRepository.search(text).stream()
+            listItem = itemRepository.search(text, (Pageable) pagination(from, size)).stream()
                                      .map(ItemMapper::toItemDto)
                                      .collect(Collectors.toList());
         }
@@ -136,5 +142,11 @@ public class ItemServiceImpl implements ItemService {
         }
         itemDtoInfo.setComments(commentDtos);
         return itemDtoInfo;
+    }
+
+    private PageRequest pagination(Integer from, Integer size) {
+        Integer page = from / size;
+        final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "id"));
+        return pageRequest;
     }
 }

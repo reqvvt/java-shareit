@@ -3,7 +3,7 @@ package ru.practicum.shareit.item;
 import java.util.List;
 
 public interface ItemService {
-    List<ItemDtoInfo> getAllItems(Integer ownerId);
+    List<ItemDtoInfo> getAllItems(Integer ownerId, Integer from, Integer size);
 
     ItemDtoInfo getItemById(Integer itemId, Integer ownerId);
 
@@ -13,7 +13,7 @@ public interface ItemService {
 
     void removeItem(Integer itemId);
 
-    List<ItemDto> searchItem(String text, Integer ownerId);
+    List<ItemDto> searchItem(String text, Integer ownerId, Integer from, Integer size);
 
     CommentDto addComment(Integer userId, Integer itemId, CommentDto commentDto);
 }
