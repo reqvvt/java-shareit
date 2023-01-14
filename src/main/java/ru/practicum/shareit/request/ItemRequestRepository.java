@@ -11,7 +11,7 @@ import java.util.List;
 public interface ItemRequestRepository extends JpaRepository<ItemRequest, Integer> {
 
     @Query("select r from ItemRequest r " +
-            "where r.requester.id = ?1 " +
+            "where r.requester.id = :requesterId " +
             "order by r.created desc")
     List<ItemRequest> findAllByRequesterId(Integer requesterId);
 

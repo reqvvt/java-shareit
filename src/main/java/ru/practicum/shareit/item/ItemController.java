@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.markers.Create;
+import ru.practicum.shareit.markers.Update;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -43,7 +44,7 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@Validated({Create.class}) @RequestBody ItemDto itemDto,
+    public ItemDto updateItem(@Validated({Update.class}) @RequestBody ItemDto itemDto,
                               @RequestHeader(X_SHARER_USER_ID) Integer userId, @PathVariable Integer itemId) {
         log.info("Вызван метод updateItem() в ItemController");
         return itemService.updateItem(itemDto, userId, itemId);

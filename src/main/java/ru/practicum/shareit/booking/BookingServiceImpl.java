@@ -2,8 +2,9 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -29,45 +30,51 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDto> getAllByBookerId(Integer bookerId, String state, Integer from, Integer size) {
         BookingState bookingState;
+        Pageable pageable = pagination(from, size);
         try {
             bookingState = BookingState.valueOf(state);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("{\"error\": \"Unknown state: " + state + "\" }");
         }
-        List<Booking> bookingList;
+        Page<Booking> bookingList;
         LocalDateTime dateTime = LocalDateTime.now();
         userRepository.findById(bookerId).orElseThrow(() -> new NotFoundException(
                 String.format("Пользователь с id = %s не найден", bookerId)));
         switch (bookingState) {
             case ALL:
-                bookingList = bookingRepository.findByBookerIdOrderByStartDesc(bookerId);
+                bookingList = bookingRepository.findByBookerIdOrderByStartDesc(bookerId, pageable);
                 break;
             case WAITING:
                 bookingList = bookingRepository.findByBookerIdAndStatusEqualsOrderByStartDesc(
                         bookerId,
-                        BookingStatus.WAITING);
+                        BookingStatus.WAITING,
+                        pageable);
                 break;
             case REJECTED:
                 bookingList = bookingRepository.findByBookerIdAndStatusEqualsOrderByStartDesc(
                         bookerId,
-                        BookingStatus.REJECTED);
+                        BookingStatus.REJECTED,
+                        pageable);
                 break;
             case PAST:
                 bookingList = bookingRepository.findByBookerIdAndEndIsBeforeAndStatusEqualsOrderByStartDesc(
                         bookerId,
                         dateTime,
-                        BookingStatus.APPROVED);
+                        BookingStatus.APPROVED,
+                        pageable);
                 break;
             case FUTURE:
                 bookingList = bookingRepository.findByBookerIdAndStartIsAfterOrderByStartDesc(
                         bookerId,
-                        dateTime);
+                        dateTime,
+                        pageable);
                 break;
             case CURRENT:
                 bookingList = bookingRepository.findByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
                         bookerId,
                         dateTime,
-                        dateTime);
+                        dateTime,
+                        pageable);
                 break;
             default:
                 throw new NotFoundException("Недопустимый статус");
@@ -83,49 +90,55 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDto> getAllByOwnerId(Integer ownerId, String state, Integer from, Integer size) {
         BookingState bookingState;
+        Pageable pageable = pagination(from, size);
         try {
             bookingState = BookingState.valueOf(state);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("{\"error\": \"Unknown state: " + state + "\" }");
         }
-        List<Integer> ownerItemsList = itemRepository.findAllByOwner(ownerId)
+        List<Integer> ownerItemsList = itemRepository.findAllByOwnerIdOrderByIdAsc(ownerId, PageRequest.of(0, Integer.MAX_VALUE))
                                                      .stream()
                                                      .map(Item::getId)
                                                      .collect(Collectors.toList());
-        List<Booking> bookingList;
+        Page<Booking> bookingList;
         LocalDateTime dateTime = LocalDateTime.now();
         userRepository.findById(ownerId).orElseThrow(() -> new NotFoundException(
                 String.format("Пользователь с id = %s не найден", ownerId)));
         switch (bookingState) {
             case ALL:
-                bookingList = bookingRepository.findByItemIdInOrderByStartDesc(ownerItemsList);
+                bookingList = bookingRepository.findByItemIdInOrderByStartDesc(ownerItemsList, pageable);
                 break;
             case WAITING:
                 bookingList = bookingRepository.findByItemIdInAndStatusEqualsOrderByStartDesc(
                         ownerItemsList,
-                        BookingStatus.WAITING);
+                        BookingStatus.WAITING,
+                        pageable);
                 break;
             case REJECTED:
                 bookingList = bookingRepository.findByItemIdInAndStatusEqualsOrderByStartDesc(
                         ownerItemsList,
-                        BookingStatus.REJECTED);
+                        BookingStatus.REJECTED,
+                        pageable);
                 break;
             case PAST:
                 bookingList = bookingRepository.findByItemIdInAndEndIsBeforeAndStatusEqualsOrderByStartDesc(
                         ownerItemsList,
                         dateTime,
-                        BookingStatus.APPROVED);
+                        BookingStatus.APPROVED,
+                        pageable);
                 break;
             case FUTURE:
                 bookingList = bookingRepository.findByItemIdInAndStartIsAfterOrderByStartDesc(
                         ownerItemsList,
-                        dateTime);
+                        dateTime,
+                        pageable);
                 break;
             case CURRENT:
                 bookingList = bookingRepository.findByItemIdInAndStartBeforeAndEndIsAfterOrderByStartDesc(
                         ownerItemsList,
                         dateTime,
-                        dateTime);
+                        dateTime,
+                        pageable);
                 break;
             default:
                 throw new NotFoundException("Недопустимый статус");
@@ -201,8 +214,13 @@ public class BookingServiceImpl implements BookingService {
         throw new NotFoundException("Статус брони может изменять только владелец");
     }
 
-    private PageRequest pagination(Integer from, Integer size) {
-        Integer page = from < size ? 0 : from / size;
-        return PageRequest.of(page, size, Sort.by("start").descending());
+    private Pageable pagination(Integer from, Integer size) {
+        int page;
+        if (from < 0) {
+            throw new IllegalArgumentException("from должен быть >= 0");
+        } else {
+            page = from / size;
+        }
+        return PageRequest.of(page, size);
     }
 }
