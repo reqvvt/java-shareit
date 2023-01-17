@@ -53,10 +53,10 @@ public class UserControllerTest {
                 .thenReturn(userDto);
 
         mockMvc.perform(get("/users/{userId}", userDto.getId())
-                .content(mapper.writeValueAsString(userDto))
-                .characterEncoding(StandardCharsets.UTF_8)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
+                       .content(mapper.writeValueAsString(userDto))
+                       .characterEncoding(StandardCharsets.UTF_8)
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .accept(MediaType.APPLICATION_JSON))
                .andExpect(status().isOk())
                .andExpect(jsonPath("$.id", is(userDto.getId()), Integer.class))
                .andExpect(jsonPath("$.name", is(userDto.getName()), String.class))

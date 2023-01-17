@@ -28,6 +28,8 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
             "order by b.start ")
     Optional<Booking> findNextBooking(Integer itemId, Integer ownerId);
 
+    Page<Booking> findAllByBookerId(Integer bookerId, Pageable page);
+
     Page<Booking> findByBookerIdOrderByStartDesc(Integer bookerId, Pageable pageable);
 
     Page<Booking> findByBookerIdAndStatusEqualsOrderByStartDesc(Integer bookerId, BookingStatus status, Pageable pageable);

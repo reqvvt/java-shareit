@@ -67,7 +67,7 @@ class ItemControllerTest {
                .andExpect(jsonPath("$[0].available", is(itemDtoInfo.getAvailable()), Boolean.class));
 
         verify(itemService, times(1))
-                .getAllItems(anyInt(),  anyInt(), anyInt());
+                .getAllItems(anyInt(), anyInt(), anyInt());
     }
 
     @Test

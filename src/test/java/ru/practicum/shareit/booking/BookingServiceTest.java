@@ -47,7 +47,7 @@ class BookingServiceTest {
         owner = new User(2, "owner", "owner@email.ru");
         item = new Item(1, "item", "descrItem", true, owner.getId(), null);
         booking = new Booking(1, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(3), item, booker, BookingStatus.WAITING);
-        bookingDto = new BookingDto(1, booking.getStart(), booking.getEnd(),item, booker, booking.getStatus());
+        bookingDto = new BookingDto(1, booking.getStart(), booking.getEnd(), item, booker, booking.getStatus());
         bookingDtoIn = new BookingDtoIn(bookingDto.getItem().getId(), bookingDto.getStart(), bookingDto.getEnd());
     }
 
@@ -55,7 +55,7 @@ class BookingServiceTest {
     void getAllByBookerId() {
         when(userRepository.findById(anyInt()))
                 .thenReturn(Optional.of(booker));
-        when(bookingRepository.findByBookerIdOrderByStartDesc(anyInt(), any(Pageable.class)))
+        when(bookingRepository.findAllByBookerId(anyInt(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(booking)));
 
         List<BookingDto> res = bookingService.getAllByBookerId(booker.getId(), "ALL", 0, 3);
@@ -68,7 +68,7 @@ class BookingServiceTest {
     void getAllByBookerIdBookingEmpty() {
         when(userRepository.findById(anyInt()))
                 .thenReturn(Optional.of(booker));
-        when(bookingRepository.findByBookerIdOrderByStartDesc(anyInt(), any(Pageable.class)))
+        when(bookingRepository.findAllByBookerId(anyInt(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
 
         Exception ex = assertThrows(NotFoundException.class, () -> bookingService.getAllByBookerId(booker.getId(),
@@ -81,7 +81,7 @@ class BookingServiceTest {
         booking.setStatus(BookingStatus.REJECTED);
         when(userRepository.findById(anyInt()))
                 .thenReturn(Optional.of(booker));
-        when(bookingRepository.findByBookerIdOrderByStartDesc(anyInt(), any(Pageable.class)))
+        when(bookingRepository.findAllByBookerId(anyInt(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(booking)));
 
         List<BookingDto> res = bookingService.getAllByBookerId(booker.getId(), "REJECTED", 0, 3);
@@ -96,7 +96,7 @@ class BookingServiceTest {
                 LocalDateTime.now().minusHours(1), item, booker, BookingStatus.APPROVED);
         when(userRepository.findById(anyInt()))
                 .thenReturn(Optional.of(booker));
-        when(bookingRepository.findByBookerIdOrderByStartDesc(anyInt(), any(Pageable.class)))
+        when(bookingRepository.findAllByBookerId(anyInt(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(lastBooking)));
 
         List<BookingDto> res = bookingService.getAllByBookerId(booker.getId(), "PAST", 0, 3);
@@ -111,7 +111,7 @@ class BookingServiceTest {
                 LocalDateTime.now().plusDays(5), item, booker, BookingStatus.APPROVED);
         when(userRepository.findById(anyInt()))
                 .thenReturn(Optional.of(booker));
-        when(bookingRepository.findByBookerIdOrderByStartDesc(anyInt(), any(Pageable.class)))
+        when(bookingRepository.findAllByBookerId(anyInt(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(nextBooking)));
 
         List<BookingDto> res = bookingService.getAllByBookerId(booker.getId(), "FUTURE", 0, 3);
@@ -126,7 +126,7 @@ class BookingServiceTest {
                 LocalDateTime.now().plusDays(5), item, booker, BookingStatus.APPROVED);
         when(userRepository.findById(anyInt()))
                 .thenReturn(Optional.of(booker));
-        when(bookingRepository.findByBookerIdOrderByStartDesc(anyInt(), any(Pageable.class)))
+        when(bookingRepository.findAllByBookerId(anyInt(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(currentBooking)));
 
         List<BookingDto> res = bookingService.getAllByBookerId(booker.getId(), "CURRENT", 0, 3);
@@ -134,31 +134,6 @@ class BookingServiceTest {
         assertNotNull(res);
         assertEquals(1, res.size());
     }
-
-//    @Test
-//    void getAllByOwnerId() {
-//        when(userRepository.findById(anyInt()))
-//                .thenReturn(Optional.of(owner));
-//        when(bookingRepository.findByItemIdInOrderByStartDesc(any(Pageable.class)))
-//                .thenReturn(List.of(booking));
-//
-//        List<BookingDto> res = bookingService.getAllByOwnerId(owner.getId(), "WAITING", 0, 3);
-//
-//        assertNotNull(res);
-//        assertEquals(1, res.size());
-//    }
-//
-//    @Test
-//    void getAllByOwnerIdNotFoundException() {
-//        when(userRepository.findById(anyInt()))
-//                .thenReturn(Optional.of(owner));
-//        when(bookingRepository.findAllByOwnerId(anyInt(), any(Pageable.class)))
-//                .thenReturn(List.of());
-//
-//        Exception ex = assertThrows(NotFoundException.class, () -> bookingService.getAllByOwnerId(owner.getId(),
-//                "WAITING", 0, 3));
-//        assertEquals("Бронирований не найдено.", ex.getMessage());
-//    }
 
     @Test
     void getBookingById() {
