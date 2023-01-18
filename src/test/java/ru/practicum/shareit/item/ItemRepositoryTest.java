@@ -54,7 +54,7 @@ class ItemRepositoryTest {
 
     @Test
     void findItemByItemRequestId() {
-        List<Item> res = itemRepository.findItemByItemRequestId(itemRequest.getId());
+        List<Item> res = itemRepository.findItemByItemRequestIdOrderByIdDesc(itemRequest.getId());
 
         assertNotNull(res);
         assertEquals(1, res.size());

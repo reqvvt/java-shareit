@@ -30,7 +30,7 @@ class ItemRequestRepositoryTest {
 
     @Test
     void findAllByRequesterId() {
-        List<ItemRequest> res = itemRequestRepository.findAllByRequesterId(requester.getId());
+        List<ItemRequest> res = itemRequestRepository.findAllByRequesterIdOrderByCreatedDesc(requester.getId());
 
         assertNotNull(res);
         assertEquals(1, res.size());

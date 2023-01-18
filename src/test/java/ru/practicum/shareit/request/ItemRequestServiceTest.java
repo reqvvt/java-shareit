@@ -35,7 +35,7 @@ class ItemRequestServiceTest {
     ItemRequest itemRequest;
     ItemRequest itemRequest2;
     ItemRequestDto itemRequestDto;
-    ItemRequestDtoOut itemRequestDtoOut;
+    ItemRequestOutDto itemRequestOutDto;
 
     @BeforeEach
     void init() {
@@ -45,7 +45,7 @@ class ItemRequestServiceTest {
         itemRequest = new ItemRequest(1, "descr", user, LocalDateTime.now());
         itemRequest2 = new ItemRequest(2, "desc2", user2, LocalDateTime.now().plusHours(2));
         itemRequestDto = new ItemRequestDto(itemRequest.getId(), itemRequest.getDescription(), itemRequest.getCreated());
-        itemRequestDtoOut = new ItemRequestDtoOut(itemRequest.getId(), itemRequest.getDescription(),
+        itemRequestOutDto = new ItemRequestOutDto(itemRequest.getId(), itemRequest.getDescription(),
                 itemRequest.getCreated(), null);
     }
 
@@ -77,10 +77,10 @@ class ItemRequestServiceTest {
     void getAll() {
         when(userRepository.findById(any()))
                 .thenReturn(Optional.of(user));
-        when(itemRequestRepository.findAllByRequesterId(anyInt()))
+        when(itemRequestRepository.findAllByRequesterIdOrderByCreatedDesc(anyInt()))
                 .thenReturn(List.of(itemRequest));
 
-        List<ItemRequestDtoOut> res = itemRequestService.getAll(user.getId());
+        List<ItemRequestOutDto> res = itemRequestService.getAll(user.getId());
 
         assertNotNull(res);
         assertEquals(1, res.size());
@@ -93,7 +93,7 @@ class ItemRequestServiceTest {
         when(itemRequestRepository.findAllByRequesterIdNot(anyInt(), any(Pageable.class)))
                 .thenReturn(List.of(itemRequest2));
 
-        List<ItemRequestDtoOut> res = itemRequestService.getAllByOtherUsers(user.getId(), 0, 2);
+        List<ItemRequestOutDto> res = itemRequestService.getAllByOtherUsers(user.getId(), 0, 2);
 
         assertNotNull(res);
         assertEquals(1, res.size());
@@ -106,7 +106,7 @@ class ItemRequestServiceTest {
         when(itemRequestRepository.findById(anyInt()))
                 .thenReturn(Optional.of(itemRequest));
 
-        ItemRequestDtoOut res = itemRequestService.getById(user.getId(), itemRequest.getId());
+        ItemRequestOutDto res = itemRequestService.getById(user.getId(), itemRequest.getId());
 
         assertNotNull(res);
         assertEquals(itemRequestDto.getId(), res.getId());

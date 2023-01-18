@@ -34,16 +34,16 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public List<ItemRequestDtoOut> getAll(Integer userId) {
+    public List<ItemRequestOutDto> getAll(Integer userId) {
         userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException(String.format("Пользователь с id = %s не найден", userId)));
-        return itemRequestRepository.findAllByRequesterId(userId).stream()
+        return itemRequestRepository.findAllByRequesterIdOrderByCreatedDesc(userId).stream()
                                     .map(r -> ItemRequestMapper.toItemRequestDtoOut(r, getItems(r.getId())))
                                     .collect(Collectors.toList());
     }
 
     @Override
-    public List<ItemRequestDtoOut> getAllByOtherUsers(Integer userId, Integer from, Integer size) {
+    public List<ItemRequestOutDto> getAllByOtherUsers(Integer userId, Integer from, Integer size) {
         Integer page = from / size;
         userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException(String.format("Пользователь с id = %s не найден", userId)));
@@ -53,7 +53,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public ItemRequestDtoOut getById(Integer userId, Integer requestId) {
+    public ItemRequestOutDto getById(Integer userId, Integer requestId) {
         userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException(String.format("Пользователь с id = %s не найден", userId)));
         ItemRequest itemRequest = itemRequestRepository.findById(requestId).orElseThrow(
@@ -62,7 +62,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     private List<ItemDto> getItems(Integer id) {
-        return itemRepository.findItemByItemRequestId(id).stream()
+        return itemRepository.findItemByItemRequestIdOrderByIdDesc(id).stream()
                              .map(ItemMapper::toItemDto)
                              .collect(Collectors.toList());
     }
