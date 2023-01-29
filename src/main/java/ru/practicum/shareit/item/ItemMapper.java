@@ -9,7 +9,8 @@ public class ItemMapper {
                 item.getId(),
                 item.getName(),
                 item.getDescription(),
-                item.getAvailable()
+                item.getAvailable(),
+                item.getItemRequest() == null ? null : item.getItemRequest().getId()
         );
     }
 
@@ -18,7 +19,8 @@ public class ItemMapper {
                 itemDto.getId(),
                 itemDto.getName(),
                 itemDto.getDescription(),
-                itemDto.getAvailable());
+                itemDto.getAvailable(),
+                null);
     }
 
     public static ItemDtoInfo toItemDtoInfo(Item item) {
