@@ -27,21 +27,21 @@ public class ItemRequestController {
     }
 
     @GetMapping
-    public List<ItemRequestOutDto> getAllByRequester(@RequestHeader(X_SHARER_USER_ID) Integer userId) {
+    public List<ItemRequestResponse> getAllByRequester(@RequestHeader(X_SHARER_USER_ID) Integer userId) {
         log.info("Вызван метод getAllByUser() в ItemRequestController");
         return itemRequestService.getAll(userId);
     }
 
     @GetMapping("/all")
-    public List<ItemRequestOutDto> getAllByOtherUsers(@RequestHeader(X_SHARER_USER_ID) Integer userId,
-                                                      @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
-                                                      @Positive @RequestParam(defaultValue = "10") Integer size) {
+    public List<ItemRequestResponse> getAllByOtherUsers(@RequestHeader(X_SHARER_USER_ID) Integer userId,
+                                                        @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                                        @Positive @RequestParam(defaultValue = "10") Integer size) {
         log.info("Вызван метод getAllOtherUser() в ItemRequestController");
         return itemRequestService.getAllByOtherUsers(userId, from, size);
     }
 
     @GetMapping("/{requestId}")
-    public ItemRequestOutDto getById(@RequestHeader(X_SHARER_USER_ID) Integer userId, @PathVariable Integer requestId) {
+    public ItemRequestResponse getById(@RequestHeader(X_SHARER_USER_ID) Integer userId, @PathVariable Integer requestId) {
         log.info("Вызван метод getById() в ItemRequestController");
         return itemRequestService.getById(userId, requestId);
     }

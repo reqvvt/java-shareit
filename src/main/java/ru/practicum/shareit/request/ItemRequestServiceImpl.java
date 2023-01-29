@@ -34,7 +34,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public List<ItemRequestOutDto> getAll(Integer userId) {
+    public List<ItemRequestResponse> getAll(Integer userId) {
         userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException(String.format("Пользователь с id = %s не найден", userId)));
         return itemRequestRepository.findAllByRequesterIdOrderByCreatedDesc(userId).stream()
@@ -43,7 +43,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public List<ItemRequestOutDto> getAllByOtherUsers(Integer userId, Integer from, Integer size) {
+    public List<ItemRequestResponse> getAllByOtherUsers(Integer userId, Integer from, Integer size) {
         Integer page = from / size;
         userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException(String.format("Пользователь с id = %s не найден", userId)));
@@ -53,7 +53,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public ItemRequestOutDto getById(Integer userId, Integer requestId) {
+    public ItemRequestResponse getById(Integer userId, Integer requestId) {
         userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException(String.format("Пользователь с id = %s не найден", userId)));
         ItemRequest itemRequest = itemRequestRepository.findById(requestId).orElseThrow(

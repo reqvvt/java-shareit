@@ -32,14 +32,14 @@ class ItemRequestControllerTest {
     MockMvc mockMvc;
     @Autowired
     ObjectMapper mapper;
-    ItemRequestOutDto itemRequestOutDto;
+    ItemRequestResponse itemRequestResponse;
     ItemRequestDto itemRequestDto;
 
     @BeforeEach
     void init() {
-        itemRequestOutDto = new ItemRequestOutDto(1, "descr", LocalDateTime.now(), null);
-        itemRequestDto = new ItemRequestDto(itemRequestOutDto.getId(), itemRequestOutDto.getDescription(),
-                itemRequestOutDto.getCreated());
+        itemRequestResponse = new ItemRequestResponse(1, "descr", LocalDateTime.now(), null);
+        itemRequestDto = new ItemRequestDto(itemRequestResponse.getId(), itemRequestResponse.getDescription(),
+                itemRequestResponse.getCreated());
     }
 
     @Test
@@ -64,7 +64,7 @@ class ItemRequestControllerTest {
     @Test
     void getAllByRequester() throws Exception {
         when(itemRequestService.getAll(anyInt()))
-                .thenReturn(List.of(itemRequestOutDto));
+                .thenReturn(List.of(itemRequestResponse));
 
         mockMvc.perform(get("/requests")
                        .header("X-Sharer-User-Id", "1")
@@ -82,7 +82,7 @@ class ItemRequestControllerTest {
     @Test
     void getAllByOtherUsers() throws Exception {
         when(itemRequestService.getAllByOtherUsers(anyInt(), anyInt(), anyInt()))
-                .thenReturn(List.of(itemRequestOutDto));
+                .thenReturn(List.of(itemRequestResponse));
 
         mockMvc.perform(get("/requests/all")
                        .header("X-Sharer-User-Id", "1")
@@ -102,7 +102,7 @@ class ItemRequestControllerTest {
     @Test
     void getById() throws Exception {
         when(itemRequestService.getById(anyInt(), anyInt()))
-                .thenReturn(itemRequestOutDto);
+                .thenReturn(itemRequestResponse);
 
         mockMvc.perform(get("/requests/{requestId}", itemRequestDto.getId())
                        .header("X-Sharer-User-Id", "1")

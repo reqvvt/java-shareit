@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ItemRequestOutDto {
+public class ItemRequestResponse {
     private Integer id;
     @NotBlank(groups = Create.class)
     private String description;
