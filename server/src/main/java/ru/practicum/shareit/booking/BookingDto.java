@@ -6,8 +6,6 @@ import lombok.NoArgsConstructor;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.User;
 
-import javax.validation.constraints.Future;
-import javax.validation.constraints.FutureOrPresent;
 import java.time.LocalDateTime;
 
 @Data
@@ -15,9 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class BookingDto {
     private Integer id;
-    @FutureOrPresent
     private LocalDateTime start;
-    @Future
     private LocalDateTime end;
     private Item item;
     private User booker;

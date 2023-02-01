@@ -6,8 +6,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.markers.Create;
 
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -34,8 +32,8 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public List<ItemRequestResponse> getAllByOtherUsers(@RequestHeader(X_SHARER_USER_ID) Integer userId,
-                                                        @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
-                                                        @Positive @RequestParam(defaultValue = "10") Integer size) {
+                                                        @RequestParam(defaultValue = "0") Integer from,
+                                                        @RequestParam(defaultValue = "10") Integer size) {
         log.info("Вызван метод getAllOtherUser() в ItemRequestController");
         return itemRequestService.getAllByOtherUsers(userId, from, size);
     }

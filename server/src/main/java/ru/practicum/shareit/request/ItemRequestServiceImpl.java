@@ -35,8 +35,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public List<ItemRequestResponse> getAll(Integer userId) {
-        userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с id = %s не найден", userId)));
+        checkUserExistById(userId);
         return itemRequestRepository.findAllByRequesterIdOrderByCreatedDesc(userId).stream()
                                     .map(r -> ItemRequestMapper.toItemRequestDtoOut(r, getItems(r.getId())))
                                     .collect(Collectors.toList());
@@ -44,9 +43,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public List<ItemRequestResponse> getAllByOtherUsers(Integer userId, Integer from, Integer size) {
-        Integer page = from / size;
-        userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с id = %s не найден", userId)));
+        checkUserExistById(userId);
+        int page = from / size;
         return itemRequestRepository.findAllByRequesterIdNot(userId, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "created"))).stream()
                                     .map(r -> ItemRequestMapper.toItemRequestDtoOut(r, getItems(r.getId())))
                                     .collect(Collectors.toList());
@@ -54,8 +52,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public ItemRequestResponse getById(Integer userId, Integer requestId) {
-        userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException(String.format("Пользователь с id = %s не найден", userId)));
+        checkUserExistById(userId);
         ItemRequest itemRequest = itemRequestRepository.findById(requestId).orElseThrow(
                 () -> new NotFoundException(String.format("Запрос с id = %s пользователя с id = %s не найден", requestId, userId)));
         return ItemRequestMapper.toItemRequestDtoOut(itemRequest, getItems(requestId));
@@ -65,5 +62,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return itemRepository.findItemByItemRequestIdOrderByIdDesc(id).stream()
                              .map(ItemMapper::toItemDto)
                              .collect(Collectors.toList());
+    }
+
+    private void checkUserExistById(Integer userId) {
+        if (!(userRepository.existsById(userId))) {
+            throw new NotFoundException(String.format("Пользователь c id = %s не найден", userId));
+        }
     }
 }

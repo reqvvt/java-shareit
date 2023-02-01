@@ -4,8 +4,6 @@ import lombok.*;
 import ru.practicum.shareit.request.ItemRequest;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Entity
@@ -19,11 +17,8 @@ public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @NotBlank
     private String name;
-    @NotBlank
     private String description;
-    @NotNull
     private Boolean available;
     @Column(name = "owner_id")
     private Integer ownerId;

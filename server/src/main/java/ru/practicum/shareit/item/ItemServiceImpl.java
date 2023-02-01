@@ -51,8 +51,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ItemDto addItem(ItemDto itemDto, Integer ownerId) {
-        userRepository.findById(ownerId).orElseThrow(() -> new NotFoundException(
-                String.format("Пользователь c id = %s не имеет бронирований", ownerId)));
+        checkOwnerExistById(ownerId);
         Item item = ItemMapper.toItem(itemDto);
         if (itemDto.getRequestId() != null) {
             item.setItemRequest(itemRequestRepository.findById(itemDto.getRequestId()).orElseThrow(
@@ -67,7 +66,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ItemDto updateItem(ItemDto itemDto, Integer ownerId, Integer itemId) {
-        userRepository.findById(ownerId);
+        checkOwnerExistById(ownerId);
         Item oldItem = itemRepository.findById(itemId)
                                      .orElseThrow(() -> new NotFoundException(String.format("Вещь с id = %s не найдена", itemId)));
         if (oldItem.getOwnerId().equals(ownerId)) {
@@ -154,5 +153,11 @@ public class ItemServiceImpl implements ItemService {
             page = from / size;
         }
         return PageRequest.of(page, size);
+    }
+
+    private void checkOwnerExistById(Integer ownerId) {
+        if (!(userRepository.existsById(ownerId))) {
+            throw new NotFoundException(String.format("Пользователь c id = %s не найден", ownerId));
+        }
     }
 }

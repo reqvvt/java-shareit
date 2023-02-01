@@ -4,9 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.item.ItemDto;
-import ru.practicum.shareit.markers.Create;
 
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,7 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 public class ItemRequestResponse {
     private Integer id;
-    @NotBlank(groups = Create.class)
     private String description;
     private LocalDateTime created;
     private List<ItemDto> items;

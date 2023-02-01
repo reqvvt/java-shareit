@@ -10,8 +10,6 @@ import ru.practicum.shareit.markers.Create;
 import ru.practicum.shareit.markers.Update;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -25,8 +23,8 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDtoInfo> getAllItems(@RequestHeader(X_SHARER_USER_ID) Integer userId,
-                                         @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
-                                         @Positive @RequestParam(defaultValue = "10") Integer size) {
+                                         @RequestParam(defaultValue = "0") Integer from,
+                                         @RequestParam(defaultValue = "10") Integer size) {
         log.info("Вызван метод getAllItems() в ItemController");
         return itemService.getAllItems(userId, from, size);
     }
@@ -60,8 +58,8 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemDto> searchItem(@RequestParam String text, @RequestHeader(X_SHARER_USER_ID) Integer userId,
-                                    @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
-                                    @Positive @RequestParam(defaultValue = "10") Integer size) {
+                                    @RequestParam(defaultValue = "0") Integer from,
+                                    @RequestParam(defaultValue = "10") Integer size) {
         log.info("Вызван метод searchItem() в ItemController");
         return itemService.searchItem(text, userId, from, size);
     }
